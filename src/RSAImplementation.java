@@ -7,15 +7,21 @@ import java.util.Scanner;
  */
 public class RSAImplementation {
 
-    static int N = 18923;
-    static int E = 1261;
+    // Set to default example values, overwritten on start
+     int N = 18923;
+     int E = 1261;
     static boolean debugMode = true;
 
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
 
+
+        System.out.println("Please enter the N value of public key.");
+        N = in.nextInt();
+        System.out.println("Please enter the E value of the public key.");
+        E = in.nextInt();
     /*
-        Given Information:
+        Given Example Information:
 
             n = 18923
             e = 1261
@@ -27,7 +33,7 @@ public class RSAImplementation {
             3. Decrypt the cipher text
 
      */
-
+        System
 
         // Find P & Q is our first steps in solving for d.
         int p = -1;
