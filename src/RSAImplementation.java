@@ -8,8 +8,8 @@ import java.util.Scanner;
 public class RSAImplementation {
 
     // Set to default example values, overwritten on start
-     int N = 18923;
-     int E = 1261;
+    static int N;
+    static int E;
     static boolean debugMode = true;
 
     public static void main(String[] args) {
@@ -33,13 +33,12 @@ public class RSAImplementation {
             3. Decrypt the cipher text
 
      */
-        System
 
         // Find P & Q is our first steps in solving for d.
         int p = -1;
         int q = -1;
 
-        debugPrint("Given N = 18923, and E = 1261");
+        //debugPrint("Given N = 18923, and E = 1261");
 
         debugPrint("Factoring N to find prime factors...");
         ArrayList<Integer> primeFactors = factor(N);
@@ -53,16 +52,25 @@ public class RSAImplementation {
         if(primeFactors.get(1) != null)
         q = primeFactors.get(1);
 
+        int toitent = (p-1) * (q-1);
+
         if(p != -1 && q != -1) // We have found p & q.
         {
             debugPrint("Factoring Complete:");
             debugPrint("P: " + p);
             debugPrint("Q: " + q);
+            debugPrint("Eulers Toitent: " + toitent);
         }
 
         debugPrint("Finding D...");
-        int d = multiplicativeInverse(E, p, q);
+        int d = multiplicativeInverse(E, toitent);
+        if(d == -1) // error!
+        {
+            System.out.println("Error! Something went wrong finding D, gcd(N,e) != 1?");
+        }
 
+
+        System.out.println("D:" + d);
 
     }
 
@@ -103,10 +111,65 @@ public class RSAImplementation {
         return true;
     }
 
-    public static int multiplicativeInverse(int e, int p, int q) {
+    public static int multiplicativeInverse(int e, int toitent) {
         // this should use the extended Euclidean algorithm
         // e * d = 1 (mod (p-1)(q-1))
-        int phi = (p-1) * (q-1);
+
+        // In our example, 1261 * D = 1 (mod toitent)
+        int ogToitent = toitent;
+        int workingT = toitent;
+        int workingE = e;
+        int remainder = workingT % workingE;
+        int workingM = (int) Math.floor(workingT/workingE);
+
+
+        debugPrint("Euclidean Algorithm Begin");
+        debugPrint(String.valueOf(workingT) + "= " + String.valueOf(workingM) + "(" + String.valueOf(workingE) + ")  + " + remainder);
+
+        long s = 0, t = 1, old_s = 1, old_t = 0, old_r = workingT, quotient, r = workingE;
+
+        long temp;
+        while(remainder != 1)
+        {
+            // Shift toitent and remainder to correct positions
+            workingT = workingE;
+            workingE = remainder;
+            remainder = workingT % workingE;
+            workingM = (int) Math.floor(workingT/workingE);
+
+            //Extended Euclidean Algorithm
+            // gcd(a,b) == xa + yb
+            // 1 = gcd(40, 7) == 40a + 7b = 1
+            // 1 - 7b = 40a
+            // 1 - 7b / 40 = a
+            // 7 * d = 1 (mod 40)
+            // d = e^-1 (mod 40)
+
+
+            debugPrint(String.valueOf(workingT) + "= " + String.valueOf(workingM) + "(" + String.valueOf(workingE) + ")  + " + remainder);
+        }
+
+        if(remainder == 1)
+        {
+            // we know that the gcd(e, toitent) is 1, we use brute force to determine d.
+            int d = 0;
+            boolean found = false;
+            while(!found)
+            {
+                d++;
+                if((e * d) % ogToitent == 1)
+                {
+                    found = true;
+                }
+            }
+
+            return d;
+        }
+
+
+
+
+        debugPrint("Euclidean Algorithm End");
         return -1;
     }
 
