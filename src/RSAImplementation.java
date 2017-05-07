@@ -1,25 +1,44 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
 /**
  * Created by Boyd on 4/26/2017.
  */
 public class RSAImplementation {
-
     // Set to default example values, overwritten on start
     static int N;
     static int E;
     static boolean debugMode = true;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+    	//--Reading message-------------------------------------------------
+    	Scanner m = new Scanner(new File("src/message.txt"));
+    	ArrayList<Integer> newMessage = new ArrayList<Integer>();
+        
+        while(m.hasNext()){
+        	if(m.hasNextInt()){
+        		newMessage.add(m.nextInt());
+        	}else{
+        		m.next();
+        	}
+        }
+        System.out.println(newMessage);
+        m.close();
+       //---------------------------------------------------------------------
+        
         Scanner in = new Scanner(System.in);
-
 
         System.out.println("Please enter the N value of public key.");
         N = in.nextInt();
         System.out.println("Please enter the E value of the public key.");
         E = in.nextInt();
+        in.close();
+       
     /*
         Given Example Information:
 
@@ -72,6 +91,19 @@ public class RSAImplementation {
 
         System.out.println("D:" + d);
 
+        
+        //read message array, and apply repeated squaring
+        for(int i : newMessage){
+        	i = ModularExponentiation(i, d, N);
+        	//System.out.println(i+ ",");
+        }
+        
+        //print out into character
+        System.out.println("To text Message:" );
+        for(int i : newMessage){
+        	System.out.println(numToText(i));
+        	System.out.println("----------------------");
+        }
     }
 
 
@@ -172,14 +204,52 @@ public class RSAImplementation {
         debugPrint("Euclidean Algorithm End");
         return -1;
     }
+    
 
-    public static void ModularExponentiation() {
+
+    public static int ModularExponentiation(int c, int d, int n) {
         // this should use the repeated squaring method
+    	if(d == 0) return 1;
+    	long t = ModularExponentiation(c, d/2, n);
+    	long m = (t*t) % n;
+    	if(d % 2 == 1) 
+    		m = (m * c) % n;
+    	return (int) m;
+    }
+    
+    private static String getCharForNumber(int i) {
+        return i > -1 && i < 26 ? String.valueOf((char)(i + 97)) : null;
     }
 
-    public static void numToText()
+    public static int numToText(int m)
     {
         // this should convert numbers back to characters
+    	double t = m/26.0; //initially divide number
+    	if(t == Math.floor(t)){ //check if number is whole
+    		m = (int) t; //m is now the whole number
+    		if(t > 26.0){
+    			t = t /26.0; 
+    			t = Math.floor(t) * 26.0;
+    			int text = (int) (m-t);
+    			//System.out.println("Num Text:" +text);
+    			System.out.println("Char: " +getCharForNumber(text));
+    			
+    			m = (int) t; //assign m to t for next value
+    			return numToText(m);
+    		} else{ //lest than 26 so you return
+    			System.out.println("Char: " +getCharForNumber((int) t));
+    			return (int) t;
+    		}
+    	} else{ //Not whole
+    		t = Math.floor(t) * 26.0;
+        	int text = (int) (m - t);
+        	//System.out.println("Num Text:" +text);
+        	System.out.println("Char: " +getCharForNumber(text));
+        	
+    	}
+    	m = (int) t;
+    	 return numToText(m);
+    	
     }
 
 }
