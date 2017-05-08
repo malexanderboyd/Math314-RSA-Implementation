@@ -18,7 +18,8 @@ public class RSAImplementation {
     public static void main(String[] args) throws FileNotFoundException {
     	//--Reading message-------------------------------------------------
     	Scanner m = new Scanner(new File("src/message.txt"));
-    	ArrayList<Integer> newMessage = new ArrayList<Integer>();
+        ArrayList<Integer> modMessage = new ArrayList<>();
+        ArrayList<Integer> newMessage = new ArrayList<>();
         
         while(m.hasNext()){
         	if(m.hasNextInt()){
@@ -93,19 +94,24 @@ public class RSAImplementation {
 
         
         //read message array, and apply repeated squaring
-        for(int i : newMessage){
-        	i = ModularExponentiation(i, d, N);
-        	//System.out.println(i+ ",");
+       for(int i : newMessage){
+            debugPrint("Current I: " + i);
+        	i =  ModularExponentiation(i, d, N);
+            debugPrint("Answer I: " + i);
+            modMessage.add(i);
+
         }
-        
+
+
+        System.out.println("End of mod Exponentiation");
+
         //print out into character
         System.out.println("To text Message:" );
-        for(int i : newMessage){
+        for(int i : modMessage){
         	System.out.println(numToText(i));
         	System.out.println("----------------------");
         }
     }
-
 
     public static void debugPrint(String s)
     {
@@ -212,7 +218,7 @@ public class RSAImplementation {
     	if(d == 0) return 1;
     	long t = ModularExponentiation(c, d/2, n);
     	long m = (t*t) % n;
-    	if(d % 2 == 1) 
+    	if(d % 2 == 1)
     		m = (m * c) % n;
     	return (int) m;
     }
