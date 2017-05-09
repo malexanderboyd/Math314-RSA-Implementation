@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import javax.swing.plaf.synth.SynthSeparatorUI;
@@ -14,6 +15,8 @@ public class RSAImplementation {
     static int N;
     static int E;
     static boolean debugMode = true;
+    
+   static ArrayList<String> finalMessage = new ArrayList<>(); //holds the characters for the final decrypted message and prints them out
 
     public static void main(String[] args) throws FileNotFoundException {
     	//--Reading message-------------------------------------------------
@@ -105,13 +108,24 @@ public class RSAImplementation {
 
         System.out.println("End of mod Exponentiation");
 
-        //print out into character
-        System.out.println("To text Message:" );
+        //print out final message as one long string
+        System.out.println("FINAL TO TEXT MESSAGE:" );
         for(int i : modMessage){
-        	System.out.println(numToText(i));
-        	System.out.println("----------------------");
+        	// When numToText gets called each block is added to the "finalMessage" array 
+        	// then reversed, printed, and the list is cleared to apply the process over for each block
+        	numToText(i); 
+        	Collections.reverse(finalMessage);
+        	for(String f : finalMessage){
+        		System.out.print(f);}
+        	finalMessage.clear();
+        	//System.out.println("----------------------");
         }
+        
+        
+        
+        System.out.println("Final Message:" +finalMessage);
     }
+    
 
     public static void debugPrint(String s)
     {
@@ -238,19 +252,22 @@ public class RSAImplementation {
     			t = Math.floor(t) * 26.0;
     			int text = (int) (m-t);
     			//System.out.println("Num Text:" +text);
-    			System.out.println("Char: " +getCharForNumber(text));
+    			//System.out.println("Char: " +getCharForNumber(text));
+    			finalMessage.add(getCharForNumber(text));
     			
     			m = (int) t; //assign m to t for next value
     			return numToText(m);
     		} else{ //lest than 26 so you return
-    			System.out.println("Char: " +getCharForNumber((int) t));
+    			//System.out.println("Char: " +getCharForNumber((int) t));
+    			finalMessage.add(getCharForNumber((int) t));
     			return (int) t;
     		}
     	} else{ //Not whole
     		t = Math.floor(t) * 26.0;
         	int text = (int) (m - t);
         	//System.out.println("Num Text:" +text);
-        	System.out.println("Char: " +getCharForNumber(text));
+        	//System.out.println("Char: " +getCharForNumber(text));
+        	finalMessage.add(getCharForNumber(text));
         	
     	}
     	m = (int) t;
